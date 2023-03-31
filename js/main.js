@@ -5,22 +5,38 @@ let txtNumber = document.getElementById("Number");
 let btnAgregar = document.getElementById("btnAgregar");
 let btnClear = document.getElementById("btnClear");
 
-let alertaValidaciones = document.getElementById("alertaValidacionestexto");
+let alertaValidaciones = document.getElementById("alertaValidacionesTexto");
 let btnValidaciones = document.getElementById("alertValidaciones");
 
-let tabla = document.getElementByYd ("tablaListaCompras");
+let tabla = document.getElementById ("tablaListaCompras");
 let cuerpoTabla = tabla.getElementsByTagName("tbody");
 
 let contadorProductos = document.getElementById("contadorProductos");
 let productosTotal = document.getElementById("productosTotal");
 let precioTotal = document.getElementById("precioTotal");
 
-let idValid = true;
+let isValid = true;
 let idTimeout; 
 let precio = 0;
 let contador = 0;
 let totalEnProductos = 0;
 let costoTotal = 0;
+
+let datos = []; // aqui se alamacenan datos de la tabla
+
+let resumen = `{"contadorProductos" : ${contador},
+                "totalEnProductos"  : ${totalEnProductos},
+                "costoTotal"        : ${costoTotal.toFixed(2)}}`;
+localStorage.setItem ("resumen", resumen) ;
+        //localStorage.setItem("contadorProductos", contador);
+        //localStorage.setItem("contadorProductos", contador);        
+        //localStorage.setItem("contadorProductos", contador);
+        txtNombre.value="";
+        txtNumber.value="";
+        txtNombre.focus();
+    // if Valid
+;
+// btnAgregar click
 
 // Limpiar campos
 btnClear.addEventListener("click", function (event){
@@ -32,26 +48,26 @@ btnClear.addEventListener("click", function (event){
     contador = 0;
     totalEnProductos = 0;
     costoTotal = 0;
-    contadorProductos.innertext = "0";
+    contadorProductos.innerText = "0";
     productosTotal.innerText = "0";
     precioTotal.innerText = "$ 0";
 
     localStorage.setItem("contadorProductos",contador);
-    localStorage.setItem("totalEnProdcutos", totalEnProdcutos);
+    localStorage.setItem("totalEnProductos", totalEnProductos);
     localStorage.setItem("costoTotal", costoTotal.toFixed(2));
 
 });//click btnClear
 
-function validarCanntidad(){
+function validarCantidad(){
     if (txtNumber.value.length==0){
         return false;
         }//if
 
         if (isNaN(txtNumber.value)){
-            returnfalse;
+            return false;
         }
 
-        if (parsefloat(txtNumber.value)<=0){
+        if (parseFloat(txtNumber.value)<=0){
             return false;
         }//if
 
@@ -59,10 +75,9 @@ function validarCanntidad(){
 
 }//validarCantidad
 
-function getPrecio(){
-    Math.floor(Math,random()* 50 * 100) /100;
+function getPrecio() {
+    return Math.floor(Math.random() * 50 * 100) / 100;
 }// get precio
-
 
 btnAgregar.addEventListener("click", function(event) {
     event.preventDefault();
@@ -85,7 +100,7 @@ btnAgregar.addEventListener("click", function(event) {
 
         }//if txtNombre
 
-    if (! validarCanntidad()){
+    if (! validarCantidad()){
         txtNumber.style.border="solid thin red";
         lista += "<li>se debe escribir un nombre validos</li>"
         alertaValidaciones.style.display="block";
@@ -103,10 +118,21 @@ btnAgregar.addEventListener("click", function(event) {
         contador ++;
         let row =   `<tr>
                         <td>${contador}</td>
-                        <td>${txtNombre.value}</td>
+                        <td>${txtNumber.value}</td>
                         <td>${txtNumber.value}</td>
                         <td>${precio}</td>
                     </tr>`;
+               
+        let elemento =   `{
+                                   "id": ${contador}
+                              "nombre"$: ${txtNumber.value}
+                            "cantidad" :${txtNumber.value}
+                              "precio" :${precio}
+                            }`;
+    
+        datos.push( JSON.parte(elemento));
+
+        localStorage.setItem("datos", JSON.stringify(datos) );
 
         //LimpiarCamposTabla
         cuerpoTabla[0].insertAdjacentHTML("beforeend", row);
@@ -137,22 +163,129 @@ btnAgregar.addEventListener("click", function(event) {
 
 window.addEventListener("load", function(event){
     if (localStorage.getItem("contadorProductos")==null){
-        localStorage.getItem("contadorProductos", "0");
-    }//if
-    
-    if (localStorage.getItem("totalEnProductos")==null){
-        localStorage.getItem("totalEnProductos", "0");
-    }//if
+        localStorage.setItem("contadorProductos", "0");
+    } //if
+    let res = JSON.parse (localStorage.getItem("resumen"));
+    if (this.localStorage.getItem("Datos")== null) {
+        datos= JSON.parse (localStorage.getItem("Datos"));
 
-    if (localStorage.getItem("costoTotal")==null){
-        localStorage.getItem("costoTotal", "0");
-    }//if
-    contador= parseInt(localStorage.getItem("contadorProductos"));
-       totalEnProductos = parseInt(localStorage.getItem("totalEnProductos"));
-       costoTotal = parseFloat(localStorage.getItem("costoTotal"));
+        datos.forEach(r =>{
+             
+            let row =   `<tr>
+            <td>${r. id}</td>
+            <td>${r.nombre}</td>
+            <td>${r.cantidad}</td>
+            <td>${r.precio}</td>
+        </tr>`;
+                cuerpoTabla[0].insertAdjacentHTML("beforeend", ron);
+
+        });
+
+    }; // !-null
+    // if (localStorage.getItem("totalEnProductos")==null){
+    //    localStorage.setItem("totalEnProductos", "0");
+    // }//if
+
+    // if (localStorage.getItem("costoTotal")==null){
+    //  localStorage.setItem("costoTotal", "0");
+    // }//if
+       contador= res.contadorProductos; //(localStorage.getItem("contadorProductos"));
+       totalEnProductos = res.totalEnProductos; // (localStorage.getItem("totalEnProductos"));
+       costoTotal = res.costoTotal; //(localStorage.getItem("costoTotal"));
 
         contadorProductos.innerText=contador;
         productosTotal.innerText=totalEnProductos;
-        precioTotal.innerText= `$ ${costoTotal}`;
+        precioTotal.innerText= `$ ${costoTotal.toFixed(2)}`;
 
     }); 
+
+
+/*
+localStorage - Almacena Información en el navegador, y se mantiene aunque
+                el navegador se cierre
+
+sessionStorage - Almacena información en el navegador, y se pierde cuando 
+                el navegador se cierra 
+
+
+                local vs session (Sorage)
+    El tiempo   que la información es almacenada
+
+*/
+
+/*
+
+
+
+
+*/
+
+
+
+let btnGuardar = document.getElementById("btnGuardar");
+let btnVer = document.getElementById("btnVer");
+let btnBorrar = document.getElementById("btnBorrar");
+let txtData= document.getElementById("data");
+let alertResultado = document.getElementById("alertResultado");
+let key = "info";
+
+btnGuardar.addEventListener("click", function(event){
+    event.preventDefault();
+    //localStorage API
+    if (txtData.value.trim() === "") {
+        alert("Por favor, ingrese algún valor");
+        return;
+    }
+    localStorage.setItem("info", txtData.value);
+    localStorage.setItem("info", txtData.value);
+    //localStorage.setItem(key, txtData.value);
+    sessionStorage.setItem(key, txtData.value);
+    //aditamento extra texto conf
+    if (txtData.value.trim() === "") {
+        alert("Por favor, ingrese algún valor");
+        return;
+    }
+    localStorage.setItem("info", txtData.value);
+    if (txtData.value.trim() === "") {
+        alertResultado.classList.remove("alert-success");
+        alertResultado.classList.add("alert-danger");
+        alertResultado.innerText = "El campo no puede estar vacío.";
+    } else {
+        localStorage.setItem(key, txtData.value.trim());
+        alertResultado.classList.remove("alert-danger");
+        alertResultado.classList.add("alert-success");
+        alertResultado.innerText = "Datos guardados correctamente.";
+    }
+});
+
+btnVer.addEventListener("click", function(event){
+    event.preventDefault();
+    alertResultado.innerText = localStorage.getItem(key);
+    //aditamento extra texto conf
+    let data = localStorage.getItem(key);
+    if (!data) {
+        alertResultado.classList.remove("alert-success");
+        alertResultado.classList.add("alert-warning");
+        alertResultado.innerText = "No hay datos almacenados.";
+    } else {
+        alertResultado.classList.remove("alert-danger");
+        alertResultado.classList.add("alert-success");
+        alertResultado.innerText = data;
+    }
+});
+
+btnBorrar.addEventListener("click", function(event){
+    event.preventDefault();
+    localStorage.removeItem(key);
+    txtData.value = "";
+    alertResultado.classList.remove("alert-danger");
+    alertResultado.classList.add("alert-success");
+    alertResultado.innerText = "Datos borrados correctamente.";
+});
+
+// Manejo de errores
+if (typeof(Storage) === "undefined") {
+    alertResultado.classList.remove("alert-success");
+    alertResultado.classList.add("alert-danger");
+    alertResultado.innerText = "Lo siento, su navegador no soporta el almacenamiento local.";
+}
